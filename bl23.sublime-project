@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "src"
+		},
+		{
+			"path": "frameworks\\runtime-src\\Classes"
+		},
+		{
+			"path": "frameworks\\cocos2d-x\\cocos"
+		}
+	]
+}
