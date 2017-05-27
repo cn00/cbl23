@@ -7,8 +7,15 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
 	LPTSTR    lpCmdLine,
 	int       nCmdShow)
 {
+	AllocConsole();
+	freopen("CONIN$", "r", stdin);
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
     auto simulator = SimulatorWin::getInstance();
-    return simulator->run();
+    auto ret = simulator->run();
+	FreeConsole();
+	return ret;
 }

@@ -158,7 +158,7 @@ void SimulatorWin::openNewPlayerWithProjectConfig(const ProjectConfig &config)
     commandLine.append(" ");
     commandLine.append(config.makeCommandLine());
 
-    CCLOG("SimulatorWin::openNewPlayerWithProjectConfig(): %s", commandLine.c_str());
+    CCLOG(__FUNCTION__": %s", commandLine.c_str());
 
     // http://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx
     SECURITY_ATTRIBUTES sa = {0};
@@ -257,14 +257,11 @@ int SimulatorWin::run()
     // create console window
     if (_project.isShowConsole())
     {
-        AllocConsole();
         _hwndConsole = GetConsoleWindow();
         if (_hwndConsole != NULL)
         {
-            ShowWindow(_hwndConsole, SW_SHOW);
-            BringWindowToTop(_hwndConsole);
-            freopen("CONOUT$", "wt", stdout);
-            freopen("CONOUT$", "wt", stderr);
+            //ShowWindow(_hwndConsole, SW_SHOW);
+            //BringWindowToTop(_hwndConsole);
 
             HMENU hmenu = GetSystemMenu(_hwndConsole, FALSE);
             if (hmenu != NULL)
@@ -461,7 +458,7 @@ void SimulatorWin::setupUI()
     HWND &hwnd = _hwnd;
     ProjectConfig &project = _project;
     auto dispatcher = Director::getInstance()->getEventDispatcher();
-    dispatcher->addEventListenerWithFixedPriority(EventListenerCustom::create("APP.EVENT", [&project, &hwnd, scaleMenuVector](EventCustom* event){
+    dispatcher->addEventListenerWithFixedPriority(EventListenerCustom::create(kAppEventName, [&project, &hwnd, scaleMenuVector](EventCustom* event){
         auto menuEvent = dynamic_cast<AppEvent*>(event);
         if (menuEvent)
         {
@@ -557,13 +554,13 @@ void SimulatorWin::setupUI()
         AppEvent *dropEvent = dynamic_cast<AppEvent*>(event);
         if (dropEvent)
         {
-            string dirPath = dropEvent->getDataString() + "/";
-            string configFilePath = dirPath + CONFIG_FILE;
+            string dirPath = dropEvent->getDataString();
+            string configFilePath = dirPath + "/" + CONFIG_FILE;
 
-			CCLOG("dropEvent:%s", dirPath.c_str());
             if (FileUtils::getInstance()->isDirectoryExist(dirPath) &&
                 FileUtils::getInstance()->isFileExist(configFilePath))
             {
+				CCLOG("dropEvent:%s", configFilePath.c_str());
                 // parse config.json
                 ConfigParser::getInstance()->readConfig(configFilePath);
 
@@ -756,7 +753,7 @@ LRESULT CALLBACK SimulatorWin::windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
             auto menuItem = menuService->getItemByCommandId(menuId);
             if (menuItem)
             {
-                AppEvent event("APP.EVENT", APP_EVENT_MENU);
+                AppEvent event(kAppEventName, APP_EVENT_MENU);
 
                 std::stringstream buf;
                 buf << "{\"data\":\"" << menuItem->getMenuId().c_str() << "\"";
@@ -805,27 +802,25 @@ LRESULT CALLBACK SimulatorWin::windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
     {
         HDROP hDrop = (HDROP)wParam;
 
-        const int count = DragQueryFileW(hDrop, 0xffffffff, NULL, 0);
+        const int count = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
 
-        if (count > 0)
+        for (int fileIndex = 0; fileIndex < count; ++ fileIndex)
         {
-            int fileIndex = 0;
-
-            const UINT length = DragQueryFileW(hDrop, fileIndex, NULL, 0);
+            const UINT length = DragQueryFile(hDrop, fileIndex, NULL, 0);
             WCHAR* buffer = (WCHAR*)calloc(length + 1, sizeof(WCHAR));
 
-            DragQueryFileW(hDrop, fileIndex, buffer, length + 1);
+            DragQueryFile(hDrop, fileIndex, buffer, length + 1);
             char *utf8 = SimulatorWin::convertTCharToUtf8(buffer);
             std::string firstFile(utf8);
             CC_SAFE_FREE(utf8);
-            DragFinish(hDrop);
 
             // broadcast drop event
-            AppEvent forwardEvent("APP.EVENT.DROP", APP_EVENT_DROP);
+            AppEvent forwardEvent(kAppEventDropName, APP_EVENT_DROP);
             forwardEvent.setDataString(firstFile);
 
             Director::getInstance()->getEventDispatcher()->dispatchEvent(&forwardEvent);
         }
+        DragFinish(hDrop);
     }   // WM_DROPFILES
 
     }
