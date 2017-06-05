@@ -3,6 +3,7 @@
 #include "audio/include/SimpleAudioEngine.h"
 #include "cocos2d.h"
 #include "scripting/lua-bindings/manual/lua_module_register.h"
+#include "cocos/network/HttpClient.h"
 
 using namespace CocosDenshion;
 
@@ -60,7 +61,9 @@ bool AppDelegate::applicationDidFinishLaunching()
     //register custom function
     //LuaStack* stack = engine->getLuaStack();
     //register_custom_function(stack->getLuaState());
-    
+
+	network::HttpClient::getInstance()->enableCookies(nullptr);
+
 #if CC_64BITS
     FileUtils::getInstance()->addSearchPath("src/64bit");
 #endif
@@ -70,6 +73,8 @@ bool AppDelegate::applicationDidFinishLaunching()
     {
         return false;
     }
+
+	Director::getInstance()->getConsole()->listenOnTCP(5678);
 
     return true;
 }
