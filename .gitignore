@@ -156,5 +156,6 @@ tests/cpp-tests/Resources/audio
 simulator/
 runtime/
 bak/
+*.bak.*
 
 *.sublime-workspace
