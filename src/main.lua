@@ -15,20 +15,16 @@ function objdump(obj, breakline)
         return '"' .. string.gsub(str, '"', '\"') .. '"'
     end
     wrapKey = function(val)
-        if breakline == nil or breakline == true then
-            if type(val) == "number" then
+        if type(val) == "number" then
+            if breakline ~= false then
                 return "[" .. val .. "] = "
-            elseif type(val) == "string" then
-                return "[" .. quoteStr(val) .. "] = "
-            else
-                return "[" .. tostring(val) .. "] = "
-            end
-        else
-            if type(val) == "string" then
-                return quoteStr(val) .. " = "
             else
                 return ""
             end
+        elseif type(val) == "string" then
+            return "[" .. quoteStr(val) .. "] = "
+        else
+            return "[" .. tostring(val) .. "] = "
         end
     end
     wrapVal = function(val, level)
@@ -83,14 +79,23 @@ function cnlog( ... )
     end
 end
 
-require "cocos.init"
-
 print("searching paths:")
 for k,v in pairs(cc.FileUtils:getInstance():getSearchPaths()) do
 	print(k,v)
 end
 
+HU = require "luahotupdate"
+--please replace the second parameter with you src path
+HU.Init("hotupdatelist", {"F:\\23\\clua\\src"}) 
+
+require "cocos.init"
+
 local function main()
+    collectgarbage("collect")
+    -- avoid memory leak
+    collectgarbage("setpause", 100)
+    collectgarbage("setstepmul", 5000)                                             
+
     require("app.MyApp"):create():run()
 end
 
