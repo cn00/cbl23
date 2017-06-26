@@ -45,20 +45,15 @@ end
 function AppBase:createView(name)
     for _, root in ipairs(self.configs_.viewsRoot) do
         local packageName = string.format("%s.%s", root, name)
-        local status, view = xpcall(function()
-                return require(packageName)
-            end, function(msg)
-            if not string.find(msg, string.format("'%s' not found:", packageName)) then
-                print("load view error: ", msg)
-            end
-        end)
+        local view = require(packageName)
         local t = type(view)
-        if status and (t == "table" or t == "userdata") then
+        if (t == "table" or t == "userdata") then
+            print("AppBase:createView", name, t, view)
             return view:create(self, name)
+        else
+            print("error status", t)
         end
     end
-    error(string.format("AppBase:createView() - not found view \"%s\" in search paths \"%s\"",
-        name, table.concat(self.configs_.viewsRoot, ",")), 0)
 end
 
 function AppBase:onCreate()
