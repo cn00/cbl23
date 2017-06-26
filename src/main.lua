@@ -3,10 +3,14 @@ require "config"
 cc.FileUtils:getInstance():setPopupNotify(false)
 
 function objdump(obj, breakline)
-    local getIndent, quoteStr, wrapKey, wrapVal, dumpObj
+    local getIndent, quoteStr, wrapKey, wrapVal, dumpObj, resetObj
     getIndent = function(level)
         if breakline == nil or breakline == true then
-            return string.rep("\t", level)
+            if level > 0 then
+                return string.rep("|   ", level-1).."|---"
+            else
+                return ""
+            end
         else
             return ""
         end
@@ -38,31 +42,48 @@ function objdump(obj, breakline)
             return tostring(val)
         end
     end
-    dumpObj = function(obj, level)
-        if type(obj) ~= "table" then
-            return wrapVal(obj)
-        end
-        level = level + 1
-        local tokens = {}
-        tokens[#tokens + 1] = "{"
-        for k, v in pairs(obj) do
-            tokens[#tokens + 1] = getIndent(level) .. wrapKey(k) .. wrapVal(v, level) .. ","
-        end
-        tokens[#tokens + 1] = getIndent(level - 1) .. "}"
-        if breakline == nil or breakline == true then
-            return table.concat(tokens, "\n")
-        else
-            return table.concat(tokens, " ")
+    resetObj = function ( lobj )
+        for k, v in pairs(lobj) do
+            if type(v) == "table" and v.dumped ~= nil then
+                _G.gprint("reset:"..tostring(v))
+                v.dumped = nil
+                resetObj(v)
+            end
         end
     end
-    return dumpObj(obj, 0)
+    dumpObj = function(lobj, level)
+        if type(lobj) ~= "table" then
+            return wrapVal(lobj)
+        end
+
+        level = level + 1
+        for k, v in pairs(lobj) do
+            if type(v) == "table" then
+                if v.dumped ~= true then
+                    v.dumped = true
+                    _G.gprint( getIndent(level) .. wrapKey(k) .. "{"  .. tostring(v))
+                    dumpObj(v, level)
+                else
+                    _G.gprint( getIndent(level) .. wrapKey(k) .. "nested " .. tostring(v))
+                end
+            else
+                _G.gprint( getIndent(level) .. wrapKey(k) .. wrapVal(v, level) .. "," )
+            end
+        end
+        _G.gprint( getIndent(level - 1) .. "}," )
+        return ""
+    end
+    _G.gprint( getIndent(0) .. "{")
+    local ret = dumpObj(obj, 0)
+    resetObj(obj)
+    return ret
 end
 
 _G.gprint=_G.print
 local function localprint( ... )
     local args = {...}
     if #args > 1 or (type(args[1]) ~= "string" and type(args[1]) ~= "number") then
-        gprint(objdump(args, false))
+        gprint(objdump(args, true))
     else
         gprint(args[1])
     end
@@ -76,6 +97,12 @@ end
 function cnlog( ... )
     if DEBUG > 0 then
         localprint( ... )
+    end
+end
+
+function warning( condition, msg )
+    if not condition then
+        __G__TRACKBACK__(msg)
     end
 end
 
