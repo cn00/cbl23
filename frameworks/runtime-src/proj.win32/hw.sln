@@ -22,7 +22,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "librecast", "..\..\cocos2d-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{DFE4DCD6-22A6-4CCD-A94A-F53ED77CD4F8}"
 EndProject
-Project("{5697748A-77EF-44CA-8824-4F5637E5945B}") = "23lua", "..\..\..\23lua.luaproj", "{E439935D-B2A2-46AE-856D-2AA408428F33}"
+Project("{5697748A-77EF-44CA-8824-4F5637E5945B}") = "hwlua", "..\..\..\hwlua.luaproj", "{E439935D-B2A2-46AE-856D-2AA408428F33}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw", "hw.vcxproj", "{4E6A7A0E-DDD8-4BAA-8B22-C964069364ED}"
 EndProject
