@@ -27,8 +27,7 @@ require "cocos.cocos2d.Cocos2dConstants"
 require "cocos.cocos2d.functions"
 
 __G__TRACKBACK__ = function(msg)
-    local msg = debug.traceback(msg)
-    print("\n<----------\n".. msg.."\n----------> ")
+    print("\n<----------\n".. debug.traceback(msg) .."\n----------> ")
     return msg
 end
 
