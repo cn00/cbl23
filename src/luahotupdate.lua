@@ -391,11 +391,21 @@ function HU.Init(UpdateListFile, RootPath, FailNotify, ENV)
 	HU.ALL = false
 end
 
-function HU.Update()
-	print("HU.Update")
-	HU.AddFileFromHUList()
-	for LuaPath, SysPath in pairs(HU.HUMap) do
-		HU.HotUpdateCode(LuaPath, SysPath)
+function HU.Update( filename )
+	print("HU.Update",  filename)
+	if filename ~= nil then
+		if HU.FileMap[filename] then
+			for _, path in pairs(HU.FileMap[filename]) do
+				HU.HotUpdateCode(path.LuaPath, path.SysPath)
+			end
+		else
+			HU.FailNotify("HotUpdate can't not find " .. filename)
+		end
+	else
+		HU.AddFileFromHUList()
+		for LuaPath, SysPath in pairs(HU.HUMap) do
+			HU.HotUpdateCode(LuaPath, SysPath)
+		end
 	end
 end
 
