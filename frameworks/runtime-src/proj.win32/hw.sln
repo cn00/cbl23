@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw", "hw.vcxproj", "{4E6A7A
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liblsqlite3", "..\..\cocos2d-x\external\lsqlite3\win32\liblsqlite3.vcxproj", "{CB5B9769-D3B1-443F-9CEB-27F1A36E0029}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liblua", "..\..\cocos2d-x\external\flatbuffers-lua\build\liblua.vcxproj", "{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +126,14 @@ Global
 		{CB5B9769-D3B1-443F-9CEB-27F1A36E0029}.Release|Win32.Build.0 = Release|Win32
 		{CB5B9769-D3B1-443F-9CEB-27F1A36E0029}.Release|x64.ActiveCfg = Release|x64
 		{CB5B9769-D3B1-443F-9CEB-27F1A36E0029}.Release|x64.Build.0 = Release|x64
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}.Debug|Win32.Build.0 = Debug|Win32
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}.Debug|x64.ActiveCfg = Debug|Win32
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}.Release|Win32.ActiveCfg = Release|Win32
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}.Release|Win32.Build.0 = Release|Win32
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,5 +147,6 @@ Global
 		{012DFF48-A13F-4F52-B07B-F8B9D21CE95B} = {DFE4DCD6-22A6-4CCD-A94A-F53ED77CD4F8}
 		{41E34993-647E-4282-8384-4AB1AE31A452} = {DFE4DCD6-22A6-4CCD-A94A-F53ED77CD4F8}
 		{CB5B9769-D3B1-443F-9CEB-27F1A36E0029} = {DFE4DCD6-22A6-4CCD-A94A-F53ED77CD4F8}
+		{9ECD6F0B-8A6F-9AE1-732A-AE355F6B2132} = {DFE4DCD6-22A6-4CCD-A94A-F53ED77CD4F8}
 	EndGlobalSection
 EndGlobal

@@ -25,6 +25,8 @@ THE SOFTWARE.
 local display = {}
 
 local director = cc.Director:getInstance()
+print("cocos.display", tostring(director))
+
 local view = director:getOpenGLView()
 
 if not view then
@@ -134,7 +136,7 @@ local function setConstants()
     printInfo(string.format("# display.right_bottom         = {x = %0.2f, y = %0.2f}", display.right_bottom.x, display.right_bottom.y))
     printInfo(string.format("# display.right_center         = {x = %0.2f, y = %0.2f}", display.right_center.x, display.right_center.y))
     printInfo(string.format("# display.center_top           = {x = %0.2f, y = %0.2f}", display.center_top.x, display.center_top.y))
-    printInfo(string.format("# display.center_bottom           = {x = %0.2f, y = %0.2f}", display.center_bottom.x, display.center_bottom.y))
+    printInfo(string.format("# display.center_bottom        = {x = %0.2f, y = %0.2f}", display.center_bottom.x, display.center_bottom.y))
     printInfo("#")
 end
 

@@ -337,7 +337,11 @@ int SimulatorWin::run()
     title << "Cocos Simulator - " << ConfigParser::getInstance()->getInitViewName();
     initGLContextAttrs();
 	auto director = Director::getInstance();
-	auto glview = director->getOpenGLView(); // GLViewImpl::createWithRect(title.str(), frameRect, frameScale);
+	auto glview = director->getOpenGLView(); 
+	if (glview == nullptr) {
+		glview = GLViewImpl::createWithRect(title.str(), frameRect, frameScale);
+		director->setOpenGLView(glview);
+	}
     _hwnd = glview->getWin32Window();
     player::PlayerWin::createWithHwnd(_hwnd);
     DragAcceptFiles(_hwnd, TRUE);

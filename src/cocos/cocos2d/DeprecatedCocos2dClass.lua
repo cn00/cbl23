@@ -1749,7 +1749,6 @@ _G["cc.EGLView"] = DeprecatedClass.EGLView()
 --EGLView class will be Deprecated,begin
 function DeprecatedClass.EGLView()
     deprecatedTip("cc.EGLView","cc.GLView")
-    print(cc.GLView)
     return cc.GLView
 end
 _G["cc.EGLView"] = DeprecatedClass.EGLView()

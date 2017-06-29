@@ -1,5 +1,6 @@
 
 local ViewBase = class("ViewBase", cc.Node)
+print("ViewBase", type(ViewBase), type(cc.Node), cc.Node)
 
 function ViewBase:ctor(app, name)
     self:enableNodeEvents()

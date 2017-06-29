@@ -1,120 +1,11 @@
 
-require "com.interaction.TouchMove"
+local Editor = class("Editor", cc.load("mvc").ViewBase)
 
-local MainScene = class("MainScene", cc.load("mvc").ViewBase)
-
-local sqlite3 = require("sqlite3")
 local sq3 = sqlite3
--- local i = 0
--- for k,v in pairs(getmetatable(sqlite3)) do
---   print(i, k,v)
---   i = i+1
--- end
+local targetObj = nil
 
-local db = sq3.open("test.sqlite3")
-
-local errno, errmsg = db:exec([[
-  CREATE TABLE `nodes` (
-    `id`  INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-    `uid` INTEGER UNIQUE,
-    `rotation_x`  NUMERIC,
-    `rotation_y`  NUMERIC,
-    `rotationZ_x` NUMERIC,
-    `rotationZ_y` NUMERIC,
-    `scale_x` NUMERIC,
-    `scale_y` NUMERIC,
-    `scale_z` NUMERIC,
-    `position_x`  NUMERIC,
-    `position_y`  NUMERIC,
-    `position_z`  NUMERIC,
-    `skew_x`  NUMERIC,
-    `skew_y`  NUMERIC,
-    `local_z` NUMERIC,
-    `global_z`  INTEGER,
-    `parent`  INTEGER,
-    `tag` INTEGER,
-    `name`  TEXT,
-    `description`  TEXT,
-    `visible` INTEGER,
-    `displayOpacity`  INTEGER,
-    `realOpacity` INTEGER
-  );
-]])
-print("warning", errno, errmsg)
-
-function MainScene.testMenuOnclick(tag, sender)
-  local menu = cc.Menu:create()
-    :move(display.center_top.x, display.center_top.y-30)
-    -- :addTo(cc.Director:getInstance():getRunningScene())
-    :addTo(sender.root)
-  menu:setAnchorPoint(cc.p(0,0))
-
-  print(getmetatable(sender.root))
-
-  cc.MenuItemFont:setFontSize(26)
-  local  item1 = cc.MenuItemFont:create("SQLITE-----999")
-  item1:registerScriptTapHandler(MainScene.testMenuOnclick)
-  item1:setAnchorPoint(cc.p(0,0))
-  item1.root=sender.root
-  menu:addChild(item1)
-
-  menu:alignItemsVerticallyWithPadding(10)
-  menu:alignItemsVertically() -- default = 5
-
-  -- assert( db:exec ("CREATE TABLE test (col1, col2, col3)"))
-  assert( db:exec ([[ 
-    CREATE TABLE `test` (
-      `id`   INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-      `col1` TEXT,
-      `col2` TEXT,
-      `col3` TEXT
-    );
-  ]]))
-  db:exec ("CREATE UNIQUE INDEX u_index_1 ON test (col1)")
-
-  db:exec ("INSERT INTO test (col1,col2,col3) VALUES (11, 2, 1)", function ( ctx, ncols, values, names )
-    print(" ------ exec INSERT INTO test (col1,col2,col3) callback", ctx, ncols, values, names)
-    return sqlite3.OK
-  end)
-
-  db:exec ("INSERT INTO test (col1,col2,col3) VALUES (12, 3, 4)" )
-  db:exec ("INSERT INTO test (col1,col2,col3) VALUES (13, 3, 6)" )
-  db:exec ("INSERT INTO test (col1,col2,col3) VALUES (14, 3, 8)" )
-  db:exec ("INSERT INTO test (col1,col2,col3) VALUES (15, 3, 10)")
-
-  -- (fun_name, argc, func)
-  db:create_function("my_sum2", 3, function(ctx, a, b, c)
-    ctx:result_number( a + b * c )
-  end)
-
-  print("1: db:exec db_exec_callback with userdata, column, number, record {v, ...} and column names {k, ...} table")
-  db:exec ("SELECT *, my_sum2(col1, col2, col3) FROM test", function ( udata, ncols, values, names )
-    print(type(udata), udata, ncols, values, names) -- values names are reused tables
-    return sqlite3.OK
-  end, db)
-
-  db:create_function("my_sum", 2, function(ctx, a, b)
-    ctx:result_number( a + b )
-  end)
-  print("2: db:rows db_next_packed_row return {idx, v, ...} table")
-  for row in db:rows("SELECT *, my_sum(col1, col2) FROM test") do
-    print(row)
-  end
-  print("3: db:nrows db_next_named_row return {k=v, ...} table")
-  for row in db:nrows("SELECT *, my_sum(col1, col2) FROM test") do
-    print(row)
-  end
-  print("4: db:urows db_next_row return v ...")
-  for c1, c2, c3, c4, c5 in db:urows("SELECT *, my_sum(col1, col2) FROM test") do
-    print(c1, c2, c3, c4, c5)
-  end
-end
-
-local ctrl_pressed = false
-local alt_pressed = false
-function MainScene:onCreate()
+function Editor:onCreate()
   local dispatcher = cc.Director:getInstance():getEventDispatcher()
-  print("dispatcher:", dispatcher)
 
   -- 键盘
   local keyboardListener = cc.EventListenerKeyboard:create()
@@ -135,9 +26,9 @@ function MainScene:onCreate()
     end
   end, cc.Handler.EVENT_KEYBOARD_PRESSED )
   keyboardListener:registerScriptHandler( function ( keyCode, event )
-    print("key released", keyCode, getmetatable(event))
+    print("key released", keyCode, event:getmetadata())
     if keyCode == cc.KeyCode.KEY_R then
-      Hotfix.hotfix_module("app.views.MainScene")
+      HU.Update("MainScene")
       -- HU.Update()
     elseif keyCode == cc.KeyCode.KEY_ALT then
       alt_pressed = false
@@ -147,33 +38,56 @@ function MainScene:onCreate()
   end, cc.Handler.EVENT_KEYBOARD_RELEASED )
   dispatcher:addEventListenerWithSceneGraphPriority(keyboardListener, self)
 
-  -- 拖拽
-  local movelistener = TouchMove:create()
-
   local menu = cc.Menu:create()
     :move(display.center)
     :addTo(self)
   menu:setAnchorPoint(cc.p(0,0))
 
+
   cc.MenuItemFont:setFontSize(16)
   local item1 = cc.MenuItemFont:create("SQLITE3")
-  item1.root=self
-  item1:registerScriptTapHandler(MainScene.testMenuOnclick)
+  item1.self=self
+  item1:registerScriptTapHandler(testMenuOnclick)
   item1:setAnchorPoint(cc.p(0,0))
-  dispatcher:addEventListenerWithSceneGraphPriority(movelistener, item1)
   menu:addChild(item1)
   -- menu:alignItemsVerticallyWithPadding(10)
   menu:alignItemsVertically() -- default = 5
+
+  -- 拖拽
+  local movelistener = cc.EventListenerTouchOneByOne:create()
+  movelistener:setSwallowTouches(true)
+  movelistener:registerScriptHandler(function (touch, event)
+      local target = event:getCurrentTarget()
+      local rect = target:getBoundingBox()
+      if cc.rectContainsPoint(rect, touch:getLocation()) then
+        target:setScale(target:getScaleX()*0.99)
+        target:setGlobalZOrder(target:getGlobalZOrder()+10000)
+        targetObj = target
+        return true
+      else
+        return false
+      end
+  end,cc.Handler.EVENT_TOUCH_BEGAN )
+  movelistener:registerScriptHandler(function (touch, event)
+      local target = event:getCurrentTarget()
+      local posX,posY = target:getPosition()
+      local delta = touch:getDelta()
+      target:setPosition(cc.p(posX + delta.x, posY + delta.y))
+  end,cc.Handler.EVENT_TOUCH_MOVED )
+  movelistener:registerScriptHandler(function (touch, event)
+      local target = event:getCurrentTarget()
+      target:setScale(target:getScaleX()/0.99)
+      target:setGlobalZOrder(target:getGlobalZOrder()-10000)
+  end,cc.Handler.EVENT_TOUCH_ENDED )
 
   -- add HelloWorld label
   local label = cc.Label:createWithSystemFont("Hello World", "Arial", 20)
     :move(display.cx, display.top-20)
     :addTo(self)
-  dispatcher:addEventListenerWithSceneGraphPriority(movelistener:clone(), label)
+  dispatcher:addEventListenerWithSceneGraphPriority(movelistener, label)
 
   -- 文件拖放
   local dropListener = cc.EventListenerCustom:create("APP.EVENT.DROP", function ( event )
-    print(event)
     local filePath = event:getUserDataStr()
     filePath = string.gsub(filePath, "\\", "/")
     label:setString(filePath)
@@ -207,12 +121,10 @@ function MainScene:onCreate()
           cc.SpriteFrameCache:getInstance():addSpriteFrames(plist)
           -- frames metadata
           local frames = cc.FileUtils:getInstance():getValueMapFromFile(plist)["frames"]
-          print(frames)
           local frameList = {}
           for k, v in pairs(frames) do 
             table.insert(frameList, {key=k, value=v})
           end
-          sprite:setSpriteFrame(frameList[1].key)
 
           print("frameList length:", #frameList)
           tableView = cc.TableView:create(cc.size(twidth, display.height - 20))
@@ -395,87 +307,6 @@ function MainScene:onCreate()
     end
   end)
   dispatcher:addEventListenerWithFixedPriority(dropListener, 1)
-
-  print("MainScene:onCreate", dispatcher, movelistener, keyboardListener, menu, label)
-end
-
-function MainScene:saveNode( node )
-  -- node propertys
-  -- local nodeId = node:getUID()
-  -- assert(db:exec ( 
-  --   "UPDATE `nodes` "
-  --   .. " col1=" .. 13
-  --   .. ",col2=" .. 14
-  --   .. ",col3=" .. 15
-  --   .. " WHERE id = " .. nodeId 
-  -- ))
-  local sqlcmd = 
-    "REPLACE INTO `nodes` ("
-    -- .." `id`"
-    -- ..",`uid`"
-    -- ..",`rotation_x`"
-    -- ..",`rotation_y`"
-    .." `rotationZ_x`"
-    -- ..",`rotationZ_y`"
-    ..",`scale_x`"
-    ..",`scale_y`"
-    ..",`scale_z`"
-    ..",`position_x`"
-    ..",`position_y`"
-    ..",`position_z`"
-    ..",`skew_x`"
-    ..",`skew_y`"
-    ..",`local_z`"
-    ..",`global_z`"
-    -- ..",`parent`"
-    ..",`tag`"
-    ..",`name`"
-    ..",`description`"
-    ..",`visible`"
-    ..",`displayOpacity`"
-    ..",`realOpacity`"
-    ..") VALUES ("
-    -- .. "," .. node:getID()
-    -- .. "," .. node:getUID()
-    -- `rotation_x`  ..",".. node:getRotation()
-    -- `rotation_y`  ..",".. node:getRotation()
-    .." ".. node:getRotation()
-    -- `rotationZ_y` NUMERIC,
-    ..",".. node:getScaleX()
-    ..",".. node:getScaleY()
-    ..",".. node:getScaleZ()
-    ..",".. node:getPositionX()
-    ..",".. node:getPositionY()
-    ..",".. node:getPositionZ()
-    ..",".. node:getSkewX()
-    ..",".. node:getSkewY()
-    ..",".. node:getLocalZOrder()
-    ..",".. node:getGlobalZOrder()
-    -- ..",".. node:getParent():getUID()
-    ..",".. node:getTag()
-    -- ..",'".. string.gsub(node:getDescription(), "\"", "\\\"").."'"
-    ..",'".. node:getName().."'"
-    ..",'".. node:getDescription().."'"
-    ..",'".. tostring(node:isVisible()).."'"
-    ..",".. node:getDisplayedOpacity()
-    ..",".. node:getOpacity()
-    .. ");"
-  local errno = assert(db:exec ( sqlcmd ) == sqlite3.OK)
-  print("sqlcmd", db, errno, sqlcmd)
-
-  -- children
-  for k,v in pairs(node:getChildren()) do
-    self:saveNode(v)
-  end
-end
-
-function MainScene:save(  )
-  self:saveNode(self)
-end
-
-function MainScene:onExit( ... )
-  print("MainScene:onExit")
-  assert(db:close())
 end
 
 return MainScene

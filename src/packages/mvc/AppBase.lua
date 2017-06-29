@@ -48,7 +48,6 @@ function AppBase:createView(name)
         local view = require(packageName)
         local t = type(view)
         if (t == "table" or t == "userdata") then
-            print("AppBase:createView", name, t, view)
             return view:create(self, name)
         else
             print("error status", t)

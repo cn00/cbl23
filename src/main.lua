@@ -1,4 +1,9 @@
-require "config"
+-- package.path=package.path..";src\\?.lua"
+print("begin main.lua", package.path)
+local i=0;for k,v in pairs(_G)do print(i,k,tostring(v)) i=i+1 end
+
+require ("config")
+print("main.lua config")
 
 cc.FileUtils:getInstance():setPopupNotify(false)
 
@@ -45,7 +50,7 @@ function objdump(obj, breakline)
     resetObj = function ( lobj )
         for k, v in pairs(lobj) do
             if type(v) == "table" and v.dumped ~= nil then
-                _G.gprint("reset:"..tostring(v))
+                -- _G.gprint("reset:"..tostring(v))
                 v.dumped = nil
                 resetObj(v)
             end
@@ -66,7 +71,7 @@ function objdump(obj, breakline)
                 else
                     _G.gprint( getIndent(level) .. wrapKey(k) .. "nested " .. tostring(v))
                 end
-            else
+            elseif k ~= "dumped" then
                 _G.gprint( getIndent(level) .. wrapKey(k) .. wrapVal(v, level) .. "," )
             end
         end
@@ -106,18 +111,16 @@ function warning( condition, msg )
     end
 end
 
-print("searching paths:")
-for k,v in pairs(cc.FileUtils:getInstance():getSearchPaths()) do
-	print(k,v)
-end
+Hotfix = require "hotfix"
 
-HU = require "luahotupdate"
---please replace the second parameter with you src path
-HU.Init("hotupdatelist", {"F:\\23\\clua\\src"}) 
+print("main.lua hotupdatelist")
 
-require "cocos.init"
+require ("cocos.init")
+print("main.lua cocos.init")
 
 local function main()
+    print("main.lua main()")
+
     collectgarbage("collect")
     -- avoid memory leak
     collectgarbage("setpause", 100)
@@ -126,6 +129,7 @@ local function main()
     require("app.MyApp"):create():run()
 end
 
+print("main.lua end")
 local status, msg = xpcall(main, __G__TRACKBACK__)
 if not status then
     print(msg)

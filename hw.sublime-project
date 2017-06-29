@@ -8,10 +8,13 @@
 			"path": "frameworks\\runtime-src\\Classes"
 		},
 		{
+			"path": "doc"
+		},
+		{
 			"path": "frameworks\\cocos2d-x\\cocos"
 		},
 		{
 			"path": "frameworks\\cocos2d-x\\tests\\lua-tests"
-		},
+		}
 	]
 }
