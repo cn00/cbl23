@@ -179,7 +179,7 @@ function Editor:onCreate()
               cell.idx:setString(tostring(idx+1))
             end
             return cell
-          end, cc.TABLECELL_SIZE_AT_INDEX)
+          end, cc.TABLE_CELL_AT_INDEX)
 
           tableView:registerScriptHandler(function ( view )
             return #frameList
@@ -274,7 +274,7 @@ function Editor:onCreate()
             cell.idx:setString(tostring(idx+1))
           end
           return cell
-        end, cc.TABLECELL_SIZE_AT_INDEX)
+        end, cc.TABLE_CELL_AT_INDEX)
 
         tableView:registerScriptHandler(function ( view )
           return #animationList
