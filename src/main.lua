@@ -1,6 +1,5 @@
 -- package.path=package.path..";src\\?.lua"
 print("begin main.lua", package.path)
-local i=0;for k,v in pairs(_G)do print(i,k,tostring(v)) i=i+1 end
 
 require ("config")
 print("main.lua config")
@@ -44,15 +43,21 @@ function objdump(obj, breakline)
         elseif type(val) == "string" then
             return quoteStr(val)
         else
-            return tostring(val)
+            return quoteStr(tostring(val))
         end
     end
     resetObj = function ( lobj )
         for k, v in pairs(lobj) do
             if type(v) == "table" and v.dumped ~= nil then
                 -- _G.gprint("reset:"..tostring(v))
-                v.dumped = nil
-                resetObj(v)
+                rawset(v,"dumped", nil)
+                if rawget(v,".isclass") then
+                    local vv = getmetatable(v)
+                    rawset(vv,"dumped", nil)
+                    resetObj(vv)
+                else
+                    resetObj(v)
+                end
             end
         end
     end
@@ -64,12 +69,18 @@ function objdump(obj, breakline)
         level = level + 1
         for k, v in pairs(lobj) do
             if type(v) == "table" then
-                if v.dumped ~= true then
-                    v.dumped = true
-                    _G.gprint( getIndent(level) .. wrapKey(k) .. "{"  .. tostring(v))
-                    dumpObj(v, level)
+                if rawget(v,"dumped") == nil then
+                    _G.gprint( getIndent(level) .. wrapKey(k) .. "{type=\"" .. tostring(v).."\",")
+                    rawset(v,"dumped", true)
+                    if rawget(v,".isclass") then
+                        local vv = getmetatable(v)
+                        rawset(vv,"dumped", true)
+                        dumpObj(vv, level)
+                    else
+                        dumpObj(v, level)
+                    end
                 else
-                    _G.gprint( getIndent(level) .. wrapKey(k) .. "nested " .. tostring(v))
+                    _G.gprint( getIndent(level) .. wrapKey(k) .. "NESTED " .. tostring(v))
                 end
             elseif k ~= "dumped" then
                 _G.gprint( getIndent(level) .. wrapKey(k) .. wrapVal(v, level) .. "," )
@@ -113,10 +124,7 @@ end
 
 Hotfix = require "hotfix"
 
-print("main.lua hotupdatelist")
-
 require ("cocos.init")
-print("main.lua cocos.init")
 
 local function main()
     print("main.lua main()")
