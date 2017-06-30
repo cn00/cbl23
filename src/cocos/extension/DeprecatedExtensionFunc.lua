@@ -22,7 +22,7 @@ CCTableView.kTableViewScroll = cc.SCROLLVIEW_SCRIPT_SCROLL
 CCTableView.kTableViewZoom = cc.SCROLLVIEW_SCRIPT_ZOOM
 CCTableView.kTableCellTouched = cc.TABLECELL_TOUCHED
 CCTableView.kTableCellSizeForIndex = cc.TABLECELL_SIZE_FOR_INDEX
-CCTableView.kTableCellSizeAtIndex = cc.TABLECELL_SIZE_AT_INDEX
+CCTableView.kTableCellSizeAtIndex = cc.TABLE_CELL_AT_INDEX
 CCTableView.kNumberOfCellsInTableView = cc.NUMBER_OF_CELLS_IN_TABLEVIEW
 --Enums of CCTableView will be deprecated end
 
