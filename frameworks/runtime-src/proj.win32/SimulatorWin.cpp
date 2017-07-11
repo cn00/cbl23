@@ -113,8 +113,7 @@ SimulatorWin *SimulatorWin::getInstance()
 }
 
 SimulatorWin::SimulatorWin()
-    : _app(nullptr)
-    , _hwnd(NULL)
+    : _hwnd(NULL)
     , _hwndConsole(NULL)
     , _writeDebugLogFile(nullptr)
 {
@@ -122,7 +121,6 @@ SimulatorWin::SimulatorWin()
 
 SimulatorWin::~SimulatorWin()
 {
-    CC_SAFE_DELETE(_app);
     if (_writeDebugLogFile)
     {
         fclose(_writeDebugLogFile);
@@ -214,7 +212,6 @@ int SimulatorWin::getPositionY()
 int SimulatorWin::run()
 {
 	// create the application instance
-	_app = new AppDelegate();
 	auto app = Application::getInstance();
 
 	// Initialize instance and cocos2d.
@@ -552,7 +549,7 @@ void SimulatorWin::setupUI()
         }
     }), 1);
 
-    AppDelegate *app = _app;
+	auto app = Application::getInstance();
     auto listener = EventListenerCustom::create(kAppEventDropName, [&project, app](EventCustom* event)
     {
         AppEvent *dropEvent = dynamic_cast<AppEvent*>(event);

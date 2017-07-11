@@ -1,6 +1,8 @@
+#include "stdafx.h"
 #include "main.h"
-#include "SimulatorWin.h"
-#include <shellapi.h>
+#include "resource.h"
+#include "platform/win32/SimulatorWin.h"
+#include "AppDelegate.h"
 
 int WINAPI _tWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -14,6 +16,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+	auto app = AppDelegate();
     auto simulator = SimulatorWin::getInstance();
     auto ret = simulator->run();
 	FreeConsole();
